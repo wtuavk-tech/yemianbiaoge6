@@ -577,92 +577,121 @@ const AddModal = ({ isOpen, onClose, activeTab }: { isOpen: boolean; onClose: ()
 
 const App = () => {
   const [activeTab, setActiveTab] = useState<TabType>('工作日报');
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const tableData = useMemo(() => generateRows(activeTab), [activeTab]);
+  const rows = useMemo(() => generateRows(activeTab), [activeTab]);
   const config = TAB_CONFIGS[activeTab];
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] p-4 font-sans text-slate-800 flex flex-col gap-3">
-      <NotificationBar />
-      
-      <TabSelector activeTab={activeTab} onSelect={setActiveTab} />
-      
-      <DataOverview 
-        activeTab={activeTab} 
-        onToggleFilter={() => setIsFilterOpen(!isFilterOpen)} 
-        isFilterOpen={isFilterOpen}
-        onAdd={() => setIsAddModalOpen(true)}
-      />
+    <div className="min-h-screen bg-slate-50 p-6 font-sans text-slate-800">
+      <div className="max-w-[1800px] mx-auto">
+        <NotificationBar />
+        
+        <TabSelector activeTab={activeTab} onSelect={setActiveTab} />
+        
+        <DataOverview 
+          activeTab={activeTab} 
+          onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
+          isFilterOpen={isFilterOpen}
+          onAdd={() => setIsAddModalOpen(true)}
+        />
+        
+        <SearchPanel tab={activeTab} isOpen={isFilterOpen} />
 
-      <SearchPanel tab={activeTab} isOpen={isFilterOpen} />
-
-      {/* Table Section */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm flex-1 overflow-hidden flex flex-col min-h-0">
-         <div className="overflow-auto flex-1 custom-scrollbar">
-            <table className="w-full text-center border-collapse font-yakuhei">
-               <thead className="sticky top-0 z-10 shadow-sm">
-                  <tr>
-                    {config.headers.map((h, i) => (
-                      <th 
-                        key={i} 
-                        className="bg-slate-50 px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-r border-[#cbd5e1] last:border-r-0 whitespace-nowrap group relative"
-                      >
-                         <div className="flex items-center justify-center gap-2">
-                           <span>{h}</span>
-                           {HEADER_TOOLTIPS[h] && (
-                             <div className="group relative">
-                               <HelpCircle size={14} className="text-slate-400 cursor-help" />
-                               <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-48 bg-slate-800 text-white text-xs p-2 rounded z-50 text-center shadow-lg">
-                                 {HEADER_TOOLTIPS[h]}
-                                 <div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-slate-800"></div>
-                               </div>
-                             </div>
-                           )}
-                         </div>
-                      </th>
-                    ))}
-                    <th className="bg-slate-50 px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-[#cbd5e1] whitespace-nowrap sticky right-0 z-20 shadow-[-10px_0_10px_-5px_rgba(0,0,0,0.05)]">
-                      操作
+        {/* Table Container */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-320px)] min-h-[500px]">
+          {/* Table Header */}
+          <div className="overflow-auto custom-scrollbar flex-1 relative">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 z-20 bg-[#fafafa] shadow-sm">
+                <tr>
+                  <th className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] w-16 text-center whitespace-nowrap sticky left-0 z-30">序号</th>
+                  {config.headers.map((header) => (
+                    <th key={header} className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] whitespace-nowrap group min-w-[100px]">
+                      <div className="flex items-center gap-1.5">
+                        {header}
+                        {HEADER_TOOLTIPS[header] && (
+                          <div className="relative group/tooltip">
+                            <HelpCircle size={13} className="text-slate-400 cursor-help" />
+                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded shadow-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none w-max max-w-[250px] z-50 whitespace-normal text-center">
+                              {HEADER_TOOLTIPS[header]}
+                              <div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {tableData.map((row, idx) => (
-                    <tr key={row.id} className="hover:bg-blue-50/50 transition-colors border-b border-[#cbd5e1] group">
-                       {config.headers.map((h, colIdx) => (
-                         <td key={colIdx} className="px-4 py-2.5 text-[13px] text-slate-600 border-r border-slate-100 last:border-r-0 whitespace-nowrap max-w-[200px] truncate">
-                           {row[h]}
-                         </td>
-                       ))}
-                       <td className="px-4 py-2.5 bg-white border-l border-slate-100 sticky right-0 shadow-[-10px_0_10px_-5px_rgba(0,0,0,0.05)]">
-                         <div className="flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                           <button className="text-blue-500 hover:text-blue-700" title="编辑"><Edit size={14} /></button>
-                           <button className="text-red-500 hover:text-red-700" title="删除"><Trash2 size={14} /></button>
-                         </div>
-                       </td>
-                    </tr>
                   ))}
-               </tbody>
+                  <th className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] text-center w-24 sticky right-0 z-30 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)]">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr 
+                    key={row.id} 
+                    className="hover:bg-blue-50/50 transition-colors border-b border-slate-100 last:border-0 group"
+                  >
+                    <td className="px-4 py-3 text-[13px] text-slate-500 text-center font-mono bg-white group-hover:bg-blue-50/50 transition-colors sticky left-0 z-10 border-r border-slate-100">{index + 1}</td>
+                    {config.headers.map((header) => (
+                      <td key={`${row.id}-${header}`} className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-50 whitespace-nowrap max-w-[300px] overflow-hidden text-ellipsis">
+                         {header === '凭证' || header === '附件' ? (
+                           <div className="flex items-center gap-2 text-blue-500 cursor-pointer hover:underline">
+                              <ImageIcon size={14}/> <span>查看</span>
+                           </div>
+                         ) : (
+                           <span className={header.includes('状态') && row[header] === '生效' ? 'text-green-600 font-medium' : ''}>
+                             {row[header]}
+                           </span>
+                         )}
+                      </td>
+                    ))}
+                    <td className="px-4 py-3 text-[13px] border-b border-slate-50 sticky right-0 bg-white group-hover:bg-blue-50/50 transition-colors shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)] text-center z-10">
+                      <div className="flex items-center justify-center gap-2">
+                        <button className="p-1.5 text-blue-500 hover:bg-blue-100 rounded transition-colors" title="编辑">
+                          <Edit size={14} />
+                        </button>
+                        <button className="p-1.5 text-red-500 hover:bg-red-100 rounded transition-colors" title="删除">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
-         </div>
-         
-         {/* Pagination */}
-         <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200 bg-slate-50 text-[13px] text-slate-500">
-            <span>共 400 条记录</span>
-            <div className="flex items-center gap-2">
-               <button className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded bg-white hover:border-blue-400 hover:text-blue-500 transition-all disabled:opacity-50"><ChevronLeft size={14} /></button>
-               <div className="flex items-center gap-1">
-                 <button className="w-7 h-7 flex items-center justify-center border border-blue-500 bg-blue-500 text-white rounded">1</button>
-                 <button className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded bg-white hover:border-blue-400 hover:text-blue-500 transition-all">2</button>
-                 <button className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded bg-white hover:border-blue-400 hover:text-blue-500 transition-all">3</button>
-                 <span className="px-1">...</span>
-                 <button className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded bg-white hover:border-blue-400 hover:text-blue-500 transition-all">20</button>
-               </div>
-               <button className="w-7 h-7 flex items-center justify-center border border-slate-200 rounded bg-white hover:border-blue-400 hover:text-blue-500 transition-all"><ChevronRight size={14} /></button>
-            </div>
-         </div>
+          </div>
+          
+          {/* Pagination */}
+          <div className="h-12 border-t border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 z-20">
+             <div className="text-[13px] text-slate-500">
+               共 <span className="font-bold text-slate-700">458</span> 条记录
+             </div>
+             <div className="flex items-center gap-2">
+                <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  <ChevronLeft size={16} />
+                </button>
+                <div className="flex gap-1">
+                   {[1, 2, 3, 4, 5].map(p => (
+                     <button key={p} className={`w-8 h-8 rounded text-[13px] font-medium transition-all ${p === 1 ? 'bg-[#1890ff] text-white' : 'text-slate-600 hover:bg-slate-100'}`}>
+                       {p}
+                     </button>
+                   ))}
+                   <span className="flex items-center justify-center w-8 h-8 text-slate-400">...</span>
+                   <button className="w-8 h-8 rounded text-[13px] font-medium text-slate-600 hover:bg-slate-100">50</button>
+                </div>
+                <button className="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-500 transition-all">
+                  <ChevronRight size={16} />
+                </button>
+                <div className="ml-4 flex items-center gap-2 text-[13px] text-slate-500">
+                   <span>前往</span>
+                   <input type="text" className="w-10 h-7 border border-slate-200 rounded text-center outline-none focus:border-blue-400 transition-all" defaultValue="1" />
+                   <span>页</span>
+                </div>
+             </div>
+          </div>
+        </div>
+
       </div>
 
       <AddModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} activeTab={activeTab} />
