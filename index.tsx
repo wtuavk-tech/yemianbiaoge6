@@ -391,7 +391,6 @@ const SearchPanel = ({ tab, isOpen }: { tab: TabType, isOpen: boolean }) => {
         </div>
 
         <div className="flex gap-2 shrink-0 border-l border-slate-100 pl-8">
-          {/* 原“新增”按钮已移除 */}
           <button className="h-8 px-4 bg-[#52c41a] text-white rounded-lg text-[12px] font-bold flex items-center gap-1.5 hover:bg-green-600 shadow-sm transition-all">
             <FileSpreadsheet size={16}/> 导出
           </button>
@@ -584,8 +583,8 @@ const App = () => {
   const config = TAB_CONFIGS[activeTab];
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 font-sans text-slate-800">
-      <div className="max-w-[1800px] mx-auto">
+    <div className="h-screen bg-slate-50 p-6 font-sans text-slate-800 flex flex-col overflow-hidden">
+      <div className="max-w-[1800px] w-full mx-auto flex flex-col flex-1 min-h-0">
         <NotificationBar />
         
         <TabSelector activeTab={activeTab} onSelect={setActiveTab} />
@@ -600,15 +599,14 @@ const App = () => {
         <SearchPanel tab={activeTab} isOpen={isFilterOpen} />
 
         {/* Table Container */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[calc(100vh-320px)] min-h-[500px]">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-0">
           {/* Table Header */}
           <div className="overflow-auto custom-scrollbar flex-1 relative">
             <table className="w-full text-left border-collapse">
               <thead className="sticky top-0 z-20 bg-[#fafafa] shadow-sm">
                 <tr>
-                  <th className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] w-16 text-center whitespace-nowrap sticky left-0 z-30">序号</th>
                   {config.headers.map((header) => (
-                    <th key={header} className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] whitespace-nowrap group min-w-[100px]">
+                    <th key={header} className="px-4 py-3 text-[11.7px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] whitespace-nowrap group min-w-[100px]">
                       <div className="flex items-center gap-1.5">
                         {header}
                         {HEADER_TOOLTIPS[header] && (
@@ -623,18 +621,17 @@ const App = () => {
                       </div>
                     </th>
                   ))}
-                  <th className="px-4 py-3 text-[13px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] text-center w-24 sticky right-0 z-30 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)]">操作</th>
+                  <th className="px-4 py-3 text-[11.7px] font-bold text-slate-700 border-b border-slate-200 bg-[#fafafa] text-center w-24 sticky right-0 z-30 shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)]">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, index) => (
                   <tr 
                     key={row.id} 
-                    className="hover:bg-blue-50/50 transition-colors border-b border-slate-100 last:border-0 group"
+                    className="hover:bg-blue-50/50 transition-colors border-b border-[#cbd5e1] last:border-0 group"
                   >
-                    <td className="px-4 py-3 text-[13px] text-slate-500 text-center font-mono bg-white group-hover:bg-blue-50/50 transition-colors sticky left-0 z-10 border-r border-slate-100">{index + 1}</td>
                     {config.headers.map((header) => (
-                      <td key={`${row.id}-${header}`} className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-50 whitespace-nowrap max-w-[300px] overflow-hidden text-ellipsis">
+                      <td key={`${row.id}-${header}`} className="px-4 py-3 text-[13px] text-slate-600 border-b border-[#cbd5e1] whitespace-nowrap max-w-[300px] overflow-hidden text-ellipsis">
                          {header === '凭证' || header === '附件' ? (
                            <div className="flex items-center gap-2 text-blue-500 cursor-pointer hover:underline">
                               <ImageIcon size={14}/> <span>查看</span>
@@ -646,7 +643,7 @@ const App = () => {
                          )}
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-[13px] border-b border-slate-50 sticky right-0 bg-white group-hover:bg-blue-50/50 transition-colors shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)] text-center z-10">
+                    <td className="px-4 py-3 text-[13px] border-b border-[#cbd5e1] sticky right-0 bg-white group-hover:bg-blue-50/50 transition-colors shadow-[-5px_0_10px_-5px_rgba(0,0,0,0.05)] text-center z-10">
                       <div className="flex items-center justify-center gap-2">
                         <button className="p-1.5 text-blue-500 hover:bg-blue-100 rounded transition-colors" title="编辑">
                           <Edit size={14} />
@@ -663,7 +660,7 @@ const App = () => {
           </div>
           
           {/* Pagination */}
-          <div className="h-12 border-t border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 z-20">
+          <div className="h-12 border-t border-slate-200 bg-white flex items-center justify-center gap-6 px-6 shrink-0 z-20">
              <div className="text-[13px] text-slate-500">
                共 <span className="font-bold text-slate-700">458</span> 条记录
              </div>
